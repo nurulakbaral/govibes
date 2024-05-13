@@ -9,6 +9,7 @@ import (
 
 var (
 	DATABASE_URL_KEY = "DATABASE_URL"
+	JWT_SECRET_KEY   = "JWT_SECRET"
 )
 
 func Config(key string) string {
