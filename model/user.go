@@ -27,13 +27,13 @@ type ResponseUser struct {
 }
 
 type User struct {
-	Id        string
-	Name      string
-	Username  string
-	Email     string
-	Password  string
-	CreatedAt time.Time
-	DeletedAt pgtype.Date
+	Id        string      `json:"id"`
+	Name      string      `json:"name"`
+	Username  string      `json:"username"`
+	Email     string      `json:"email"`
+	Password  string      `json:"password"`
+	CreatedAt time.Time   `json:"created_at"`
+	DeletedAt pgtype.Date `json:"deleted_at"`
 }
 
 func (user User) InsertUser(ctx context.Context) error {
@@ -81,4 +81,30 @@ func (user User) SelectAll(ctx context.Context) ([]ResponseUser, error) {
 	}
 
 	return users, nil
+}
+
+func (user *User) SelectByEmail(ctx context.Context, email string) error {
+	userArgs := pgx.NamedArgs{
+		"email": email,
+	}
+	query := `
+		SELECT * 
+		FROM users
+		WHERE email = @email
+	`
+	err := database.DB.QueryRow(ctx, query, userArgs).Scan(
+		&user.Id,
+		&user.Name,
+		&user.Username,
+		&user.Email,
+		&user.Password,
+		&user.CreatedAt,
+		&user.DeletedAt,
+	)
+
+	if err != nil {
+		return fmt.Errorf("scan select user by email is wrong: %v", err)
+	}
+
+	return nil
 }

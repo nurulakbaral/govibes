@@ -5,14 +5,9 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"golang.org/x/crypto/bcrypt"
 	"govibes.app/model"
+	"govibes.app/utils"
 )
-
-func hashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
-}
 
 func GetAllUser(c *fiber.Ctx) error {
 	user := new(model.User)
@@ -52,7 +47,7 @@ func Register(c *fiber.Ctx) error {
 		})
 	}
 
-	hashedPassword, err := hashPassword(user.Password)
+	hashedPassword, err := utils.HashPassword(user.Password)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  "error",
