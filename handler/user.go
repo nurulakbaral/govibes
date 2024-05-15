@@ -11,7 +11,7 @@ import (
 
 func GetAllUser(c *fiber.Ctx) error {
 	user := new(user.User)
-	rows, err := user.SelectAll(c.Context())
+	rows, err := user.SelectRows(c.Context())
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -59,7 +59,7 @@ func Register(c *fiber.Ctx) error {
 	reqBody.Password = hashedPassword
 
 	userEntity := new(user.User)
-	if err := userEntity.InsertUser(c.Context(), *reqBody); err != nil {
+	if err := userEntity.InsertRow(c.Context(), *reqBody); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  "error",
 			"message": "Couldn't create user: Unable to insert new user data to database",
@@ -106,7 +106,7 @@ func EditProfile(c *fiber.Ctx) error {
 	reqBody.Id = uuid.MustParse(userId)
 
 	userEntity := new(user.User)
-	if err := userEntity.UpdateRowNameById(c.Context(), *reqBody); err != nil {
+	if err := userEntity.UpdateRowName(c.Context(), *reqBody); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  "error",
 			"message": "Edit profile is failed, try again",

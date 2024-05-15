@@ -33,7 +33,7 @@ func Login(c *fiber.Ctx) error {
 	}
 
 	userEntity := new(user.User)
-	if err := userEntity.SelectByEmail(c.Context(), reqBody.Email); err != nil {
+	if err := userEntity.SelectRowByEmail(c.Context(), reqBody.Email); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  "error",
 			"message": "User is not found",

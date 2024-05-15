@@ -21,7 +21,7 @@ type User struct {
 	DeletedAt pgtype.Date `json:"deleted_at"`
 }
 
-func (user *User) InsertUser(ctx context.Context, reqBody RequestRegister) error {
+func (user *User) InsertRow(ctx context.Context, reqBody RequestRegister) error {
 	userId, err := uuid.NewV7()
 
 	if err != nil {
@@ -57,7 +57,7 @@ func (user *User) InsertUser(ctx context.Context, reqBody RequestRegister) error
 	return nil
 }
 
-func (user User) SelectAll(ctx context.Context) ([]ResponseRegister, error) {
+func (user User) SelectRows(ctx context.Context) ([]ResponseRegister, error) {
 	var users []ResponseRegister
 	query := `
 		SELECT id, name, username, email, created_at, deleted_at
@@ -83,7 +83,7 @@ func (user User) SelectAll(ctx context.Context) ([]ResponseRegister, error) {
 	return users, nil
 }
 
-func (user *User) SelectByEmail(ctx context.Context, email string) error {
+func (user *User) SelectRowByEmail(ctx context.Context, email string) error {
 	userArgs := pgx.NamedArgs{
 		"email": email,
 	}
@@ -109,7 +109,7 @@ func (user *User) SelectByEmail(ctx context.Context, email string) error {
 	return nil
 }
 
-func (user *User) UpdateRowNameById(ctx context.Context, reqBody RequestEditProfile) error {
+func (user *User) UpdateRowName(ctx context.Context, reqBody RequestEditProfile) error {
 	userArgs := pgx.NamedArgs{
 		"id":   reqBody.Id,
 		"name": reqBody.Name,
