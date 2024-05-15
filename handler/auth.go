@@ -73,9 +73,9 @@ func Login(c *fiber.Ctx) error {
 	})
 
 	return c.JSON(fiber.Map{
-		"status":  "success",
-		"message": "Login successfully!",
-		"token":   jwtSigned,
+		"status":      "success",
+		"message":     "Login successfully!",
+		"accessToken": jwtSigned,
 		"data": user.ResponseLogin{
 			Id:        userEntity.Id,
 			Name:      userEntity.Name,
