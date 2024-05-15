@@ -13,7 +13,6 @@ import (
 )
 
 func Login(c *fiber.Ctx) error {
-
 	reqBody := new(user.RequestLogin)
 
 	if err := c.BodyParser(reqBody); err != nil {

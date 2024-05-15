@@ -2,6 +2,7 @@ package router
 
 import (
 	"govibes.app/handler"
+	"govibes.app/middleware"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -17,5 +18,5 @@ func Init(app *fiber.App) {
 	// User
 	user := api.Group("/user")
 	user.Post("/register", handler.Register)
-	user.Get("/all", handler.GetAllUser)
+	user.Get("/all", middleware.Protected(), handler.GetAllUser)
 }
