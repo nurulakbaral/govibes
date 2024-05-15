@@ -1,9 +1,13 @@
 package handler
 
 import (
+	"time"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 
+	"govibes.app/config"
 	"govibes.app/model/user"
 	"govibes.app/utils"
 )
@@ -46,11 +50,33 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
-	// Todo: Create JWT & Set Cookie
+	jwtToken := jwt.New(jwt.SigningMethodHS256)
+	jwtClaims := jwtToken.Claims.(jwt.MapClaims)
+	jwtClaims["user_id"] = userEntity.Id
+	jwtClaims["email"] = userEntity.Email
+	jwtClaims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+
+	jwtSigned, err := jwtToken.SignedString([]byte(config.Config(config.JWT_SECRET_KEY)))
+
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  "error",
+			"message": "Generate jwt token is error",
+			"errors":  err.Error(),
+		})
+	}
+
+	c.Cookie(&fiber.Cookie{
+		Name:     "Access-Token",
+		Value:    jwtSigned,
+		Expires:  time.Now().Add(time.Hour * 72),
+		HTTPOnly: true,
+	})
 
 	return c.JSON(fiber.Map{
 		"status":  "success",
 		"message": "Login successfully!",
+		"token":   jwtSigned,
 		"data": user.ResponseLogin{
 			Id:        userEntity.Id,
 			Name:      userEntity.Name,
