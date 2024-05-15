@@ -3,13 +3,14 @@ package handler
 import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"govibes.app/model"
+	"govibes.app/model/user"
 	"govibes.app/utils"
 )
 
 func GetAllUser(c *fiber.Ctx) error {
-	user := new(model.User)
+	user := new(user.User)
 	rows, err := user.SelectAll(c.Context())
+
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  "error",
@@ -26,8 +27,7 @@ func GetAllUser(c *fiber.Ctx) error {
 }
 
 func Register(c *fiber.Ctx) error {
-
-	reqBody := new(model.RequestUserRegister)
+	reqBody := new(user.RequestRegister)
 
 	if err := c.BodyParser(reqBody); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -56,7 +56,7 @@ func Register(c *fiber.Ctx) error {
 	}
 	reqBody.Password = hashedPassword
 
-	userEntity := new(model.User)
+	userEntity := new(user.User)
 	if err := userEntity.InsertUser(c.Context(), *reqBody); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  "error",
@@ -68,7 +68,7 @@ func Register(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"status":  "success",
 		"message": "Created new user successfully",
-		"data": model.ResponseUserRegister{
+		"data": user.ResponseRegister{
 			Id:        userEntity.Id,
 			Name:      userEntity.Name,
 			Username:  userEntity.Username,

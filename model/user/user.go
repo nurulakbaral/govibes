@@ -1,4 +1,4 @@
-package model
+package user
 
 import (
 	"context"
@@ -21,7 +21,7 @@ type User struct {
 	DeletedAt pgtype.Date `json:"deleted_at"`
 }
 
-func (user *User) InsertUser(ctx context.Context, reqBody RequestUserRegister) error {
+func (user *User) InsertUser(ctx context.Context, reqBody RequestRegister) error {
 	userId, err := uuid.NewV7()
 
 	if err != nil {
@@ -57,8 +57,8 @@ func (user *User) InsertUser(ctx context.Context, reqBody RequestUserRegister) e
 	return nil
 }
 
-func (user User) SelectAll(ctx context.Context) ([]ResponseUserRegister, error) {
-	var users []ResponseUserRegister
+func (user User) SelectAll(ctx context.Context) ([]ResponseRegister, error) {
+	var users []ResponseRegister
 	query := `
 		SELECT id, name, username, email, created_at, deleted_at
 		FROM users
@@ -72,7 +72,7 @@ func (user User) SelectAll(ctx context.Context) ([]ResponseUserRegister, error) 
 	defer rows.Close()
 
 	for rows.Next() {
-		user := ResponseUserRegister{}
+		user := ResponseRegister{}
 		err := rows.Scan(&user.Id, &user.Name, &user.Username, &user.Email, &user.CreatedAt, &user.DeletedAt)
 		if err != nil {
 			return nil, fmt.Errorf("scan user is error: unable to get row %v", err)

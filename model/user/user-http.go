@@ -1,4 +1,4 @@
-package model
+package user
 
 import (
 	"time"
@@ -7,7 +7,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type ResponseUserRegister struct {
+type ResponseRegister struct {
 	Id        uuid.UUID   `json:"id"`
 	Name      string      `json:"name"`
 	Username  string      `json:"username"`
@@ -16,9 +16,16 @@ type ResponseUserRegister struct {
 	DeletedAt pgtype.Date `json:"deleted_at"`
 }
 
-type RequestUserRegister struct {
+type RequestRegister struct {
 	Name     string `json:"name"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+
+type RequestLogin struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type ResponseLogin = ResponseRegister
