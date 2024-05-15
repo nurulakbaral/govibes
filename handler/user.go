@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"time"
-
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"govibes.app/model"
@@ -28,9 +26,10 @@ func GetAllUser(c *fiber.Ctx) error {
 }
 
 func Register(c *fiber.Ctx) error {
-	user := new(model.User)
 
-	if err := c.BodyParser(user); err != nil {
+	reqBody := new(model.RequestUserRegister)
+
+	if err := c.BodyParser(reqBody); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  "error",
 			"message": "Parser is error: Please, review your input",
@@ -39,7 +38,7 @@ func Register(c *fiber.Ctx) error {
 	}
 
 	validate := validator.New()
-	if err := validate.Struct(new(model.RequestUser)); err != nil {
+	if err := validate.Struct(reqBody); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  "error",
 			"message": "Invalid request body: Please, review yout input",
@@ -47,7 +46,7 @@ func Register(c *fiber.Ctx) error {
 		})
 	}
 
-	hashedPassword, err := utils.HashPassword(user.Password)
+	hashedPassword, err := utils.HashPassword(reqBody.Password)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  "error",
@@ -55,10 +54,10 @@ func Register(c *fiber.Ctx) error {
 			"errors":  err.Error(),
 		})
 	}
+	reqBody.Password = hashedPassword
 
-	user.Password = hashedPassword
-	user.CreatedAt = time.Now()
-	if err := user.InsertUser(c.Context()); err != nil {
+	userEntity := new(model.User)
+	if err := userEntity.InsertUser(c.Context(), *reqBody); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  "error",
 			"message": "Couldn't create user: Unable to insert new user data to database",
@@ -69,13 +68,13 @@ func Register(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"status":  "success",
 		"message": "Created new user successfully",
-		"data": model.ResponseUser{
-			Id:        user.Id,
-			Name:      user.Name,
-			Username:  user.Username,
-			Email:     user.Email,
-			CreatedAt: user.CreatedAt,
-			DeletedAt: user.DeletedAt,
+		"data": model.ResponseUserRegister{
+			Id:        userEntity.Id,
+			Name:      userEntity.Name,
+			Username:  userEntity.Username,
+			Email:     userEntity.Email,
+			CreatedAt: userEntity.CreatedAt,
+			DeletedAt: userEntity.DeletedAt,
 		},
 	})
 }
