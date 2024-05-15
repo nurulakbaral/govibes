@@ -7,6 +7,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+// Register Service
 type ResponseRegister struct {
 	Id        uuid.UUID   `json:"id"`
 	Name      string      `json:"name"`
@@ -23,9 +24,21 @@ type RequestRegister struct {
 	Password string `json:"password"`
 }
 
+// Login Service
 type RequestLogin struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
 type ResponseLogin = ResponseRegister
+
+// Edit Profile Service
+type RequestEditProfile struct {
+	Id   uuid.UUID `json:"id"`
+	Name string    `json:"name"`
+}
+
+type ResponseEditProfile struct {
+	Id   uuid.UUID `json:"id"`
+	Name string    `json:"name"`
+}

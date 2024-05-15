@@ -19,4 +19,5 @@ func Init(app *fiber.App) {
 	user := api.Group("/user")
 	user.Post("/register", handler.Register)
 	user.Get("/all", middleware.Protected(), handler.GetAllUser)
+	user.Put("/edit-profile", middleware.Protected(), handler.EditProfile)
 }

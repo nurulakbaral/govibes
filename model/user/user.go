@@ -108,3 +108,27 @@ func (user *User) SelectByEmail(ctx context.Context, email string) error {
 
 	return nil
 }
+
+func (user *User) UpdateRowNameById(ctx context.Context, reqBody RequestEditProfile) error {
+	userArgs := pgx.NamedArgs{
+		"id":   reqBody.Id,
+		"name": reqBody.Name,
+	}
+
+	query := `
+		UPDATE users
+		SET name = @name
+		WHERE id = @id
+	`
+
+	_, err := database.DB.Exec(ctx, query, userArgs)
+
+	if err != nil {
+		return fmt.Errorf("scan update is error: %v", err)
+	}
+
+	user.Id = reqBody.Id
+	user.Name = reqBody.Name
+
+	return nil
+}

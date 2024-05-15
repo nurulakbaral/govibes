@@ -3,6 +3,8 @@ package handler
 import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"govibes.app/model/user"
 	"govibes.app/utils"
 )
@@ -75,6 +77,49 @@ func Register(c *fiber.Ctx) error {
 			Email:     userEntity.Email,
 			CreatedAt: userEntity.CreatedAt,
 			DeletedAt: userEntity.DeletedAt,
+		},
+	})
+}
+
+func EditProfile(c *fiber.Ctx) error {
+	reqBody := new(user.RequestEditProfile)
+
+	if err := c.BodyParser(reqBody); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  "error",
+			"message": "Parsing request body is error",
+			"errors":  err.Error(),
+		})
+	}
+
+	validate := validator.New()
+	if err := validate.Struct(reqBody); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  "error",
+			"message": "Validating request body is error",
+			"errors":  err.Error(),
+		})
+	}
+	userStore := c.Locals("user").(*jwt.Token)
+	claims := userStore.Claims.(jwt.MapClaims)
+	userId := claims["user_id"].(string)
+	reqBody.Id = uuid.MustParse(userId)
+
+	userEntity := new(user.User)
+	if err := userEntity.UpdateRowNameById(c.Context(), *reqBody); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  "error",
+			"message": "Edit profile is failed, try again",
+			"errors":  err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusAccepted).JSON(fiber.Map{
+		"status":  "success",
+		"message": "Edit profile is success",
+		"data": user.ResponseEditProfile{
+			Id:   userEntity.Id,
+			Name: userEntity.Name,
 		},
 	})
 }
